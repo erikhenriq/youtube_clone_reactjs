@@ -1,48 +1,29 @@
-import React, { useState, useEffect } from 'react';
-import VideoItem from '../../components/VideoItem/VideoItem';
-import axios from '../../apis/youtube';
+import React from 'react';
+import { useLocation } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 
-const videos = [
-  {
-    title: '1',
-    url: 'https://media.metrolatam.com/2019/02/14/nopuedoestoygordito-66f2ef8c0cc974fe89c3db077a3aa2e9-1200x0.jpg'
-  },
-  {
-    title: '2',
-    url: 'https://media.metrolatam.com/2019/02/14/nopuedoestoygordito-66f2ef8c0cc974fe89c3db077a3aa2e9-1200x0.jpg'
-  },
-  {
-    title: '3',
-    url: 'https://media.metrolatam.com/2019/02/14/nopuedoestoygordito-66f2ef8c0cc974fe89c3db077a3aa2e9-1200x0.jpg'
-  }
-];
+import VideoItem from '../../components/VideoItem/VideoItem';
+import './Home.css';
 
 const Home = () => {
-  const [videos, setVideos] = useState([]);
+  const videos = (useLocation().state || {}).videos || [];
+  const history = useHistory();
 
-  const getVideo = async () => {
-
-    const response = await axios.get('/search', {
-      params: {
-        q: 'Reactjs',
-        maxResults: 20,
-      }
-    });
-
-    setVideos(response.data.items);
+  const onVideoSelect = (video) => {
+    history.push({ pathname: '/video', state: { id: video.id.videoId } })
   };
-
-  useEffect(() => {
-    getVideo();
-  }, []);
 
   return (
     <div className="ui container">
       <div className="ui grid video-list">
         <div className="ui relaxed divided list">
           {
-            videos.map((video) => {
-              return <VideoItem key={video.id.videoId} title={video.snippet.title} url={video.snippet.thumbnails.medium.url} />
+            videos.map(video => {
+              return <VideoItem
+                key={video.id.videoId}
+                video={video}
+                onVideoSelect={() => onVideoSelect(video)}
+              />
             })
           }
         </div>
